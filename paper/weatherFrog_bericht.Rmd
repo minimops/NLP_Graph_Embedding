@@ -1,0 +1,87 @@
+---
+title: |
+  ![](lmu.jpg)
+  NLP - Graph Embedding
+subtitle: |
+  | A Compilation of the Advances of Graph Embedding in NLP
+  |
+  |
+  |
+  | Supervisor: M.Sc. Matthias Assenmacher
+author: "Noah Hurmer"
+date: "tbd"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 7
+    highlight: tango
+    number_sections: yes
+fontsize: 11pt
+geometry: margin=2.5cm
+header-includes:
+- \usepackage[linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+- \usepackage{graphics}
+- \usepackage{setspace}\onehalfspacing
+- \usepackage{float}
+- \setlength{\parskip}{0em}
+- \usepackage[font={small,it}, labelfont={bf}]{caption}
+bibliography: references.bib
+
+abstract: TODO
+---
+\newpage
+
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.pos = "H", out.extra = "")
+library(tidyverse)
+library(data.table)
+library(checkmate)
+library(knitr)
+library(cluster)
+library(kableExtra)
+```
+
+\newpage
+
+\newcounter{savepage}
+\pagenumbering{Roman}
+
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\listoftables
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+\section*{List of abbreviations}
+
+```{r abbreviations, echo=FALSE}
+data.table(
+  Term = c("X"),
+  Abbreviation = c("X")) %>%
+  arrange(Term) %>%
+  kable(booktabs = TRUE, format =  "latex", escape = FALSE) %>%
+  kable_styling(latex_options = c("repeat_header", "striped"), full_width = TRUE)
+```
+
+
+\newpage
+
+\setcounter{savepage}{\arabic{page}}
+
+\pagenumbering{arabic}
+
+\section{Topic1}
+
+\section{Topic2}
+
+
+\section{References}
