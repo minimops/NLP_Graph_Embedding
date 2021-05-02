@@ -1,6 +1,6 @@
 ---
 title: |
-  ![](lmu.jpg)
+  ![](assets/lmu.jpg)
   NLP - Graph Embedding
 subtitle: |
   | A Compilation of the Advances of Graph Embedding in NLP
