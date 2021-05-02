@@ -1,6 +1,5 @@
-# weatherFrog
+# Graph Embedding
 ## LMU NLP - BA - Seminar
-### Graph Embedding
 
 Date of presentation: tbd  
 Institut: Statistik, LMU Muenchen   
