@@ -28,6 +28,8 @@ header-includes:
 - \usepackage[font={small,it}, labelfont={bf}]{caption}
 bibliography: references.bib
 
+nocite: '@*'
+
 abstract: TODO
 ---
 \newpage
@@ -55,11 +57,9 @@ library(kableExtra)
 
 \listoftables
 
-\newpage
 
 \listoffigures
 
-\newpage
 
 \section*{List of abbreviations}
 
@@ -79,9 +79,71 @@ data.table(
 
 \pagenumbering{arabic}
 
-\section{Topic1}
+# Introduction
 
-\section{Topic2}
+
+
+## Motivation
+
+## Types of Graphs
+
+\begin{itemize}
+  \item{What is a Graph}
+  \item{Directional Graphs}
+  \item{Weighted Graphs}
+  \item{Semantic Graphs}
+  \item{Knowledge Graphs}
+\end{itemize}
+
+## Applications of Graph Embedding
+
+\begin{itemize}
+  \item{Visualization}
+  \item{Network Compression}
+  \item{Network Partitioning}
+  \item{Node Classification}
+  \item{Link Prediction}
+\end{itemize}
+
+# Embedding Types
+
+## Node Embedding
+
+### Node Attributes
+
+## Edge Embedding
+
+## Multidimentional and Hybrid Embedding
+
+  \begin{itemize}
+    \item{Nodes of different Types}
+    \item{different Relations of differing Magnitudes}
+  \end{itemize}
+
+# Graph Embedding Techniques
+
+## Matrix Fatorization
+
+## Deep Learning
+
+### Random Walk
+
+### GNN's
+
+## Edge Reconstruction
+
+## Graph Kernel
+
+## Generative Model
+
+## Unsupervised Methods
+
+
+
+
+# Performance Evaluation
+
+
 
 
 \section{References}
