@@ -3,7 +3,7 @@ title: |
   ![](assets/lmu.jpg)
   NLP - Graph Embedding
 subtitle: |
-  | A Compilation of the Advances of Graph Embedding in NLP
+  | A Brief Introduction into GE Models utilizing Random Walk
   |
   |
   |
@@ -61,12 +61,12 @@ library(kableExtra)
 \listoffigures
 
 
-\section*{List of abbreviations}
+\section*{List of Abbreviations}
 
 ```{r abbreviations, echo=FALSE}
 data.table(
-  Term = c("X"),
-  Abbreviation = c("X")) %>%
+  Term = c("GE", "DL", "RW"),
+  Abbreviation = c("Graph Embedding", "Deep Learning", "Random Walk")) %>%
   arrange(Term) %>%
   kable(booktabs = TRUE, format =  "latex", escape = FALSE) %>%
   kable_styling(latex_options = c("repeat_header", "striped"), full_width = TRUE)
@@ -79,70 +79,80 @@ data.table(
 
 \pagenumbering{arabic}
 
+
+
 # Introduction
-
-
 
 ## Motivation
 
-## Types of Graphs
+## Applications
 
-\begin{itemize}
-  \item{What is a Graph}
-  \item{Directional Graphs}
-  \item{Weighted Graphs}
-  \item{Semantic Graphs}
-  \item{Knowledge Graphs}
-\end{itemize}
+  - uses in social networks
+  - visualization
+  - Network compression
+  - Network Partitioning
+  - Node Classification
+  - Link Prediction
+  - fake news detection 
 
-## Applications of Graph Embedding
+  
+perhaps omit some examples as to not overcrowd or overcomplicate this passage.
 
-\begin{itemize}
-  \item{Visualization}
-  \item{Network Compression}
-  \item{Network Partitioning}
-  \item{Node Classification}
-  \item{Link Prediction}
-\end{itemize}
+## Graph types
 
-# Embedding Types
+  - What is a Graph? 
+  - Nodes and edges
+  - Nodes are the entities
+  - Edges are the relations between nodes
+  - nodes can consist of all sort of Data, images, text, etc even mixed
+  - nodes can have additional attributes
+  
+### Graph modes
 
-## Node Embedding
+  - homogeneous, heterogeneous
+  - graphs can be directional, weighted, semantik, knowledge based
+  
+  
+## Embedding types
+  
+  - node embedding
+  - edge embedding
+  - subgraph/Groups
+  - entire Graphs
 
-### Node Attributes
 
-## Edge Embedding
+# Problem and Dataset
 
-## Multidimentional and Hybrid Embedding
+  introduce the Problem and the associated Dataset on which the algorithms below should be run on.
 
-  \begin{itemize}
-    \item{Nodes of different Types}
-    \item{different Relations of differing Magnitudes}
-  \end{itemize}
 
-# Graph Embedding Techniques
+# Deep Learning and random Walk
 
-## Matrix Fatorization
+  Short Paragraph explaining how one Approach to (node)Graph embedding utilizes Deep Learning methods. List the other approaches not using DL with a brief explanation, and especially mention how the computational advantage of the Random Walk approach can be preferable to MF.
+  
+## Random Walk
 
-## Deep Learning
+  Introduce the random Walk concept as another subsection of Deep Learning tools for Graph embedding. 
+  What is the Aim of the Random Walks?
 
-### Random Walk
+## SkipGram
 
-### GNN's
+  Briefly explain the NLM SkipGram and how its paired with Random Walks.
+  Also introduce the problem of calculating the associated softmax equation.
 
-## Edge Reconstruction
+### DeepWalk as an example for Hierarchical softmax
 
-## Graph Kernel
+### node2vec as an example for negative sampling
 
-## Generative Model
+## (LSTM)
 
-## Unsupervised Methods
-
+  Optional Section considered as an excursion to another Random Walk method using a different Model and heterogeneous Graphs as Inputs. Perhaps using HSNL as the algorithm example.
 
 
 
 # Performance Evaluation
 
+  Discuss how to evaluate Graph Embedding methods and algorithms and then evaluate the above used ones.
 
 
 
