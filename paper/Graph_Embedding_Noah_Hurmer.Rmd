@@ -83,7 +83,18 @@ data.table(
 
 # Introduction
 
-## Motivation
+
+## What is a graph
+
+  Graphs are a type of data structure that consist of so called nodes (or vertices) and edges. Often times, the nodes describe entities and the edges the pairwise relation to one another. Therefore, a graph $G$ is usually noted as $G=(V, E)$. Here, $V$ is the set of nodes and $E$ the set of edges.
+  
+  In essence, this can be thought of as a network of entities. One of the simpler realizations to imagine is perhaps a social media platform. Where a person (or their profile) is represented as a node and an edge indicates that two people are befriended on the platform.
+  As apparent in the above mentioned example, graphs can have edges that embody abstract concepts, that do not intuitively fit into any conventional coordinate system, as they cannot be mapped into an euclidean space.
+  That being said, one can also imagine more conventional observed data of a large feature space as a graph, where the edges are weighted and represent a similarity between objects.
+
+## Graph types
+
+  The type of entity that a node represents can be in any form of data, be that words or text, images
 
 ## Applications
 
@@ -112,8 +123,21 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   - homogeneous, heterogeneous
   - graphs can be directional, weighted, semantik, knowledge based
   
+
+## Motivation
+
+  Two of the main issues with data in the form of a graph are its inherent structure and the limited applicable mathematics available to deal that, and the computational challenge associated with any type of storage or calculation performed on it.
   
+  The above described composition of a graph is usually stored in a so called adjacency matrix, with the dimensions of $N\times N$, where $N$ is the number of nodes in the graph. The edges are then captured with a binary indicator (or a value for a weighted edge), whether or not two nodes are connected via an edge.
+  Not only does this become a problem if the relationship the edge represents becomes more complex, but the sheer size of such matrices can quickly become a problem both in form of (dynamic) storage space but also computational expense. 
+  
+  Therefore we aim to compress the information of a graph down to lower dimensions and into a form that lets us better apply analysis tools. Usually a vector space is selected as the embedding dimension.   
+
+
 ## Embedding types
+  
+  There are different forms of graph embedding which each go along with specific tasks they are used for.
+  
   
   - node embedding
   - edge embedding
