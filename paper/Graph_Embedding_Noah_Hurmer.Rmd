@@ -136,14 +136,16 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
 
 ## Embedding types
   
-  There are different forms of graph embedding which each go along with specific tasks they are used for.
+  There are different forms of graph embedding which each go along with specific tasks they are used for. 
   
+  - entire Graphs can be embedded in order to compare different graphs to each other. This can for example be useful for biologist to compare proteins or predict their functional labels. Here, a complex protein can be a graph which will then be embedded to a single vector.
   
-  - node embedding
-  - edge embedding
-  - subgraph/Groups
-  - entire Graphs
-
+  - It is also possible to embed subgraphs or groups of a graph separately.
+  
+  - edge embedding.
+  
+  - The most common way of graph embedding is to embed the nodes of a graph. 
+  
 
 # Problem and Dataset
 
