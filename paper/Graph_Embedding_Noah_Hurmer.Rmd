@@ -35,13 +35,12 @@ abstract: TODO
 \newpage
 
 
-```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos = "H", out.extra = "")
-library(tidyverse)
+library(dplyr)
 library(data.table)
 library(checkmate)
 library(knitr)
-library(cluster)
 library(kableExtra)
 ```
 
@@ -155,6 +154,14 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
 # Deep Learning and random Walk
 
   Short Paragraph explaining how one Approach to (node)Graph embedding utilizes Deep Learning methods. List the other approaches not using DL with a brief explanation, and especially mention how the computational advantage of the Random Walk approach can be preferable to MF.
+  
+# node2vec RW
+
+```{r exGraph, fig.cap = "\\label{fig:exGraph} Random example Graph"}
+
+include_graphics("plots/exGraph.pdf")
+
+```
   
 ## Random Walk
 
