@@ -157,7 +157,22 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   
 # node2vec RW
 
-```{r exGraph, fig.cap = "\\label{fig:exGraph} Random example Graph"}
+
+## Random Walk in node2vec
+
+  Here, two parameters are introduced to modify a RW. These modifiers, typically denoted $p$ and $q$, add a bias to the sampling of nodes during the RW in order to control mostly the locality of the walk. This results in a mixture of BFS and DFS and can therefore represent different types of network neighbourhoods and node equivalences (@node2vec).
+  The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., a, b$}, is biased not only by the weight of the edge ($b$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{a, x}$.
+  
+## Skip-gram
+  
+  - why
+  
+  - explain p and q
+  
+  - visualize with example graph
+  
+  
+```{r exGraph, fig.cap = "Random example Graph"}
 
 include_graphics("plots/exGraph.pdf")
 
