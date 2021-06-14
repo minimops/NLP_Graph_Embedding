@@ -26,6 +26,7 @@ header-includes:
 - \usepackage{float}
 - \setlength{\parskip}{0em}
 - \usepackage[font={small,it}, labelfont={bf}]{caption}
+- \usepackage{amsmath}
 bibliography: references.bib
 
 nocite: '@*'
@@ -37,7 +38,7 @@ abstract: TODO
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.pos = "H", out.extra = "")
-library(dplyr)
+library(tidyverse)
 library(data.table)
 library(checkmate)
 library(knitr)
@@ -135,15 +136,15 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
 
 ## Embedding types
   
-  There are different forms of graph embedding which each go along with specific tasks they are used for. 
+  There are different forms of graph embedding, each with their own uses and specific tasks. These are usually coupled with the structure that is preserved.
   
-  - entire Graphs can be embedded in order to compare different graphs to each other. This can for example be useful for biologist to compare proteins or predict their functional labels. Here, a complex protein can be a graph which will then be embedded to a single vector.
+  Entire Graphs can be embedded into a low dimensional vector space in order to compare different graphs to each other. Similar Graphs are embedded close to each other. This can for example be useful for biologists to compare proteins or predict their functional labels. Here, a complex protein can be a graph which will then be embedded to a single vector.
   
-  - It is also possible to embed subgraphs or groups of a graph separately.
+  The most common way of graph embedding is to embed the nodes of a graph. Here, each node is represented as a vector in a low dimensional space, where embeddings of similar or close nodes are located close to each other. This proximity can be defined in different ways. A typical metric for this is a proximity of order $n$, which describes the similarity of the $n$-order neighbourhoods of the respective nodes.
   
-  - edge embedding.
+  A different approach is to embed the edges between nodes. The so called edge- or knowledge embedding aims to preserve relations between node pairs. This is particularly useful to predict missing or validate existing links in a graph or to predict missing relations between entities.
   
-  - The most common way of graph embedding is to embed the nodes of a graph. 
+  It is also possible to embed subgraphs or groups (communities) of a graph separately. This is often referred to as hybrid embedding, as it combines aspects of node- and edge embedding to support tasks such as clustering or semantic searches.
   
 
 # Problem and Dataset
@@ -161,8 +162,26 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
 ## Random Walk in node2vec
 
   Here, two parameters are introduced to modify a RW. These modifiers, typically denoted $p$ and $q$, add a bias to the sampling of nodes during the RW in order to control mostly the locality of the walk. This results in a mixture of BFS and DFS and can therefore represent different types of network neighbourhoods and node equivalences (@node2vec).
-  The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., a, b$}, is biased not only by the weight of the edge ($b$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{a, x}$.
+  The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., a, b$}, is biased not only by the weight of the edge ($b$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{a, x}$, where
   
+$$
+\alpha_{p,q}(a,x) = 
+\begin{cases}
+    \frac{1}{p},& \text{if } d_{a,x} = 0\\
+    1,         &  \text{if } d_{a,x} = 1\\
+    \frac{1}{q},& \text{if } d_{a,x} = 2
+\end{cases}
+$$
+
+$$
+P(c_{1}=x|c_{i-1} = a)= 
+\begin{cases}
+    \frac{\pi_{ax}}{p},& \text{if } (a,v) \in E\\
+    0,& \text{otherwise}
+\end{cases}
+$$
+
+
 ## Skip-gram
   
   - why
