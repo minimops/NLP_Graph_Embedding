@@ -96,15 +96,7 @@ data.table(
 
   The type of entity that a node represents can be in any form of data, be that words or text, images
 
-## Applications
 
-  - uses in social networks
-  - visualization
-  - Network compression
-  - Network Partitioning
-  - Node Classification
-  - Link Prediction
-  - fake news detection 
 
   
 perhaps omit some examples as to not overcrowd or overcomplicate this passage.
@@ -132,6 +124,19 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   Not only does this become a problem if the relationship the edge represents becomes more complex, but the sheer size of such matrices can quickly become a problem both in form of (dynamic) storage space but also computational expense. 
   
   Therefore we aim to compress the information of a graph down to lower dimensions and into a form that lets us better apply analysis tools. Usually a vector space is selected as the embedding dimension.   
+  
+  
+## Applications
+
+  As stated, graph embedding simply lets us efficiently work with the data type of a graph. So applications are just uses, where data is in the form of a graph.
+
+  - uses in social networks
+  - visualization
+  - Network compression
+  - Network Partitioning
+  - Node Classification
+  - Link Prediction
+  - fake news detection 
 
 
 ## Embedding types
@@ -152,9 +157,28 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   introduce the Problem and the associated Dataset on which the algorithms below should be run on.
 
 
-# Deep Learning and random Walk
+# Techniques
+
+  There are several techniques that can be used to embed a graph, however these are mostly coupled with the task or goal, the type of input graph and each have their own disadvantages.
+
+  - Matrix Factorization
+  
+    This technique mostly represents the beginnings of GE and has the disadvantage of high computational and storage cost, as a Matrix of pairwise node similarity is constructed, that is then factorized to obtain the embedding of each node. Due to the fact that all node-pairs are considered (unlike other techniques), it can be quite performant, however the cost disadvantages make this largely infeasible for larger graphs.
+    
+  
+  - Deep Learning
+  
+    
+    
+  - Edge Reconstruction
+  
+  - Graph Kernel
+  
+  - Generative Model
 
   Short Paragraph explaining how one Approach to (node)Graph embedding utilizes Deep Learning methods. List the other approaches not using DL with a brief explanation, and especially mention how the computational advantage of the Random Walk approach can be preferable to MF.
+  
+## Random Walk
   
 # node2vec RW
 
