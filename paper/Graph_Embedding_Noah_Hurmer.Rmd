@@ -37,7 +37,7 @@ abstract: TODO
 
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo = FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.pos = "H", out.extra = "")
+knitr::opts_chunk$set(echo = FALSE, fig.pos = "H", out.extra = "")
 library(tidyverse)
 library(data.table)
 library(checkmate)
@@ -168,7 +168,7 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   
   - Deep Learning
   
-    
+    Recently more popular is the use of DL models. Simply put, existing (or purpose-built) DL models are applied on the input
     
   - Edge Reconstruction
   
@@ -180,39 +180,40 @@ perhaps omit some examples as to not overcrowd or overcomplicate this passage.
   
 ## Random Walk
   
-# node2vec RW
+  One category of DL based graph embedding utilizes the Random Walk principle to sample paths from a graph in order to estimate the proximity of a node pair. Each node is used as a starting point, from which neighbouring nodes are sampled in succession to obtain a path of desired length $l$.
+  The probability to reach a node $x$ from a previous node $v$ is therefore given by the number of edges at the node $v$ and is 0 if $x$ and $v$ are not directly connected by an edge.
+  More generally the probabilities are given by
+  
+\begin{equation}
+\label{eqn:RWprob}
+  P(c_i=x|c_{i-1}=v) = 
+  \begin{cases}
+    \frac{\pi_{v,x}}{Z},& \text{if } (v, x) \in E\\
+    0,&\text{otherwise}
+    
+  \end{cases}
+\end{equation}
+
+where $c_i$ denotes the $i$th node of a RW, $\pi_{v,x}$ the transition probability from node $v$ to node $x$ and $Z$ a nomalizing constant. In the basic RW form, the transition probability is 1 if the graph is unweighted and $Z$ is the number of edges originating from node $v$. (@node2vec)
+  
+  In comparison to other strict searching algorithms to create neighbourhoods of nodes, there are clear spatial and time cost advantages of RW, as they can easily be parallelized and depending on the order and length of the RW do not need a lot of memmory capacity. In addition, this technique usually does a decent job of capturing the structure of a graph, as the power-law remains. In simple terms, a well connected node will be visited more often. (@DeepWalk)
 
 
-## Random Walk in node2vec
+### Random Walk in node2vec
 
   Here, two parameters are introduced to modify a RW. These modifiers, typically denoted $p$ and $q$, add a bias to the sampling of nodes during the RW in order to control mostly the locality of the walk. This results in a mixture of BFS and DFS and can therefore represent different types of network neighbourhoods and node equivalences (@node2vec).
-  The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., a, b$}, is biased not only by the weight of the edge ($b$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{a, x}$, where
+  The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., t, v$}, is biased not only by the weight of the edge ($v$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{t, x}$, where
   
 $$
-\alpha_{p,q}(a,x) = 
+\alpha_{p,q}(t,x) = 
 \begin{cases}
-    \frac{1}{p},& \text{if } d_{a,x} = 0\\
-    1,         &  \text{if } d_{a,x} = 1\\
-    \frac{1}{q},& \text{if } d_{a,x} = 2
+    \frac{1}{p},& \text{if } d_{t,x} = 0\\
+    1,         &  \text{if } d_{t,x} = 1\\
+    \frac{1}{q},& \text{if } d_{t,x} = 2
 \end{cases}
 $$
-
-$$
-P(c_{1}=x|c_{i-1} = a)= 
-\begin{cases}
-    \frac{\pi_{ax}}{p},& \text{if } (a,v) \in E\\
-    0,& \text{otherwise}
-\end{cases}
-$$
-
-
-## Skip-gram
-  
-  - why
-  
-  - explain p and q
-  
-  - visualize with example graph
+  This bias $\alpha$ is then multiplied by the weight of the edge $w_{v,x}$ to obtain $\pi_{v,x}$ of equation \ref{eqn:RWprob}.
+  $p$, also called the Return Parameter (@node2vec), defines the probaility of backtracing a step, while $q$, also called the In-Out Parameter (@node2vec), controls the exploratory nature of the walk. Setting $p$ low and $q$ high therefore keeps the walk very local, whilst a high $p$ almost acts like a small self-avoiding-walk (@saw) and a low $q$ ensures that the walk travels further outward from the starting node.
   
   
 ```{r exGraph, fig.cap = "Random example Graph"}
@@ -221,20 +222,45 @@ include_graphics("plots/exGraph.pdf")
 
 ```
   
-## Random Walk
-
-  Introduce the random Walk concept as another subsection of Deep Learning tools for Graph embedding. 
-  What is the Aim of the Random Walks?
 
 ## SkipGram
 
-  Briefly explain the NLM SkipGram and how its paired with Random Walks.
-  Also introduce the problem of calculating the associated softmax equation.
+  \emph{node2vec} like many other RW-based DL embedding methods, utilizes a variation of skipGram as the DL model (@survey).
+  SkipGram originates in NLP with word embeddings. The model attempts to predict surrounding words of a certain range in a sentence, given a current word. The current word is used as an input to a log-linear classifier.
+  Projecting this method to the task of graph prediction, a RW is to be interpreted as a sentence and a node as a word. SkipGram can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. 
+  So, let $N(u)$ be the neighborhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
+  The objective function results in
 
-### DeepWalk as an example for Hierarchical softmax
+\begin{equation}
+\label{eqn:objecfun}
+  \max_{f} \sum_{u \in V} log(P(N(u)|f(u)))
+\end{equation}
 
-### node2vec as an example for negative sampling
+To simplify, we assume conditional indepence in a neighbourhood so that the likelihood to observe a neighbourhood can be defined by factorizing over the likelihoods to observe each neighbourhood node. 
 
+$$
+log(P(N(u)|f(u))) = \prod_{n_i\in N(u)} P(n_i|f(u))
+$$
+ Also, we define the conditional likelihood between two nodes as a softmax equation.
+ 
+$$
+P(n_i|f(u)) = \frac{exp(f(ni) * f(u))}{\sum_{v\in V} exp(f(v) * f(u))}
+$$
+  These assumptions transform the objective function \ref{eqn:objecfun} to
+
+$$
+\max_{f} \sum_{u \in V} -log \left( \sum_{v \in V} exp(f(v) * f(u)) \right) + \sum_{n_i\in N(u)} f(n_i) * f(u)
+$$
+  
+  Maybe put this somewhere else  
+  The node-neighbourhoods in \emph{node2vec} are defined by the Random Walks, so one can observe, how the walk defining parameters $p$ and $q$ directly effect the embedding, as nodes with similar neighbourhoods will end up with similar feature representations.
+  
+### Negative Sampling
+
+  However, the first sum, also called the per-node partition function 
+$\sum_{v \in V} exp(f(v) * f(u))$ is to expense to compute directly, so \emph{node2vec} utilizes negative sampling to estimate this function.
+    
+    
 ## (LSTM)
 
   Optional Section considered as an excursion to another Random Walk method using a different Model and heterogeneous Graphs as Inputs. Perhaps using HSNL as the algorithm example.
