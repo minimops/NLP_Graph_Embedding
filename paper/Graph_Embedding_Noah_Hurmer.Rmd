@@ -79,6 +79,66 @@ data.table(
 
 \pagenumbering{arabic}
 
+# Introduction
+
+## Data structure
+
+## Motivation
+
+# Embedding
+
+## Types and Applications
+
+## Techniques
+
+There are several different approaches used to embed a graph. As mentioned above, different tasks require different information to be preserved about the graph. So mostly, a given model is  designed for a specific task or goal and thus the type of input graph it can accept is often limited. \textcolor{red}{missing something here}
+  
+Embedding models are gereally summarized into the following categories.  
+
+### Matrix Factorization
+  
+This technique mostly represents the beginnings of GE and has the disadvantage of high computational and storage cost, as a Matrix of pairwise node similarity is constructed, that is then factorized to obtain the embedding of each node.
+\textcolor{red}{explain this more}
+    
+Due to the fact that all node-pairs are considered (unlike other techniques), it can be quite performant, however the cost disadvantages make this largely infeasible for larger graphs.  
+    
+  
+### Deep Learning
+  
+The use of DL models in GE has recently become more popular, as they usually carry the promise of great efficiency and performance. Simply put, existing (or purpose-built) DL models are applied in order to embed information into vector form. These models typically use Autoencoder or CNN based methods. (@survey)
+However, the input to such models can also be paths sampled from a graph. These sampled paths are strings of nodes visited during a sampling strategy. This method is called Random Walk and can be seen as its own subcategory of DL embedding models. (@GOYAL201878)
+
+### Others
+
+  - Edge Reconstruction
+  
+  - Graph Kernel
+  
+  - Generative Model
+
+## Performance Evaluation
+
+# node2vec
+
+  
+
+## Random Walk
+
+  One category of DL based graph embedding utilizes the Random Walk principle to sample paths from a graph in order to estimate the proximity of a node pair. Each node is used as a starting point, from which neighbouring nodes are sampled in succession to obtain a path of desired length $l$.
+  The probability to reach a node $x$ from a previous node $v$ is therefore given by the number of edges at the node $v$ and is 0 if $x$ and $v$ are not directly connected by an edge.
+
+## Skipgram
+
+## Negative Sampling
+
+## Extensions and Applications
+
+# Outlook into other RW models
+
+
+
+
+
 
 
 # Introduction
