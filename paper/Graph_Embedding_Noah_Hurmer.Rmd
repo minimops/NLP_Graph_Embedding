@@ -138,28 +138,22 @@ data.table(
 
 ## Types and Applications
 
-  \textcolor{red}{combine and write better}
-
-  As stated, graph embedding simply lets us efficiently work with the data type of a graph. So applications are just uses, where data is in the form of a graph.
-
-  - uses in social networks
-  - visualization
-  - Network compression
-  - Network Partitioning
-  - Node Classification
-  - Link Prediction
-  - fake news detection 
-
-  
   There are different forms of graph embedding, each with their own uses and specific tasks. These are usually coupled with the structure that is preserved.
   
-  Entire Graphs can be embedded into a low dimensional vector space in order to compare different graphs to each other. Similar Graphs are embedded close to each other. This can for example be useful for biologists to compare proteins or predict their functional labels. Here, a complex protein can be a graph which will then be embedded to a single vector.
+  Entire graphs can be embedded into a low dimensional vector space in order to compare different graphs to each other. Similar graphs are embedded close to each other. This can for example be useful for biologists to compare proteins or predict their functional labels. Here, a complex protein can be represented structurally by a single graph which will then be embedded to a single vector.
+  \textcolor{red}{source}
   
-  The most common way of graph embedding is to embed the nodes of a graph. Here, each node is represented as a vector in a low dimensional space, where embeddings of similar or close nodes are located close to each other. This proximity can be defined in different ways. A typical metric for this is a proximity of order $n$, which describes the similarity of the $n$-order neighbourhoods of the respective nodes.
+  The most common way of graph embedding is to embed the nodes of a graph. Here, each node is represented as a vector in a low dimensional space, where embeddings of similar or close nodes are located close to each other. This proximity can be defined in different ways. A typical metric for this is a proximity of order $n$, which describes the similarity of the $n$-order neighbourhoods of the respective nodes.  
   
-  A different approach is to embed the edges between nodes. The so called edge- or knowledge embedding aims to preserve relations between node pairs. This is particularly useful to predict missing or validate existing links in a graph or to predict missing relations between entities.
+  Node embedding can then be used for various downstream tasks such as node classification or clustering, in which one aims to group, categorize or label the objects of a network. Data compression or dimensionality reduction and visualization are other applications for node embedded graphs.
+  \textcolor{red}{source}
   
-  It is also possible to embed subgraphs or groups (communities) of a graph separately. This is often referred to as hybrid embedding, as it combines aspects of node- and edge embedding to support tasks such as clustering or semantic searches.
+  A different approach is to embed the edges between nodes. The so called edge- or knowledge embedding aims to preserve relations between node pairs. This is particularly useful to predict missing or validate existing links in a graph, in tern to possibly predict missing relations between entities. Typically, this is done by embedding the tupel $<a, b>$ of nodes $a$ and $b$ respectively, or the triple $<a, t, b>$ if the graph is heterogeneous, where $t$ represents the edge between the two nodes.
+  Applications of link predictions range from suggestions on social media sites to predicting interactions of proteins or drugs.
+  \textcolor{red}{sources}
+  
+  It is also possible to embed subgraphs or groups (communities) of a graph separately. This technique mostly finds its uses in community detection of a network, question answering and semantic searches. Often it is paired with a form of node embedding.
+  \textcolor{red}{multiple sources here}
   
 
 ## Techniques
@@ -188,6 +182,7 @@ However, the input to such models can also be paths sampled from a graph. These 
 
 ## Performance Evaluation
 
+\textcolor{red}{TODO}
   short section on micro and macro F1 scoring
 
 # node2vec
@@ -273,7 +268,7 @@ $$
 \max_{f} \sum_{u \in V} -log \left( \sum_{v \in V} exp(f(v) * f(u)) \right) + \sum_{n_i\in N(u)} f(n_i) * f(u)
 $$
   
-  Maybe put this somewhere else  
+  \textcolor{red}{dunno bout this following paragraph}
   The node-neighbourhoods in \emph{node2vec} are defined by the Random Walks, so one can observe, how the walk defining parameters $p$ and $q$ directly effect the embedding, as nodes with similar neighbourhoods will end up with similar feature representations.
   
 ### Negative Sampling
