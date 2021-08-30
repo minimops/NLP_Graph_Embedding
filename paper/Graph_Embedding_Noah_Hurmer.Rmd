@@ -55,9 +55,6 @@ library(kableExtra)
 
 \newpage
 
-\listoftables
-
-
 \listoffigures
 
 
@@ -65,10 +62,10 @@ library(kableExtra)
 
 ```{r abbreviations, echo=FALSE}
 data.table(
-  Term = c("GE", "DL", "RW"),
-  Abbreviation = c("Graph Embedding", "Deep Learning", "Random Walk")) %>%
+  Term = c("GE", "DL", "RW", "NCE", "NEG", "BFS", "DFS", "LSTM", "RNN", "cQA"),
+  Abbreviation = c("Graph Embedding", "Deep Learning", "Random Walk", "Noise Contrastive Estimation", "Negative Sampling", "Breadth First Search", "Depth First Search", "Long short-term memory", "Recurrent Neural Network", "Community-Based Question Answering")) %>%
   arrange(Term) %>%
-  kable(booktabs = TRUE, format =  "latex", escape = FALSE) %>%
+  kable(booktabs = TRUE, format =  "latex", escape = FALSE, linesep = "") %>%
   kable_styling(latex_options = c("repeat_header", "striped"), full_width = TRUE)
 ```
 
@@ -182,22 +179,44 @@ However, the input to such models can also be paths sampled from a graph. These 
 
 ## Performance Evaluation
 
-\textcolor{red}{TODO}
-  short section on micro and macro F1 scoring
+  The performance of a graph embedding model is typically measured by scoring the performance of downstream tasks with the gained embeddings.
+  For node classification tasks, this is generally done with a *micro-F1* and *macro-F1* score. 
+  The *F1-score* is typically an accuracy measure for binary classification tasks, defined as the harmonic mean of precision and recall.
+$$
+F1 = 2 \cdot \frac{precision \cdot recall}{precision + recall}
+$$
+*macro-F1* is simply the multiclass extension of this, averaging over the F1 scores for each label. Whereas *micro-F1* calculates precision and recall globally, which results in the proportion of true positive predictions to all positive predictions. While this shows the global average prediction accuracy, as every node prediction is weighted equally, the *macro-F1* score can be useful especially for class imbalances. (@lipton2014thresholding)    
+
+  @GOYAL201878 also propose to use Precision at k (Pr@k) as well as Mean average precision (MAP) for graph reconstruction and link prediction tasks.  
+  
+  Also, dimensionality reduction for tasks such as visualizing a network structure may be of interest, when applying graph embedding models. As performance of this cannot be measured or denoted by a numeric score, it often depends on what is the expected result or structure to be visualized.
+Scalability as well as required computational performance may additionally be interesting measures with which an embedding model is selected, as these may be required or limited respectively.
+  
 
 # node2vec
   
   *node2vec* (@node2vec) is an example of such a Random Walk based DL approach to Graph Embedding. It usually represents nodes of a Graph in the feature space and is therefore a Node embedding model. 
   
+## Word2vec summary
+
+  Similar to *DeepWalk* (@DeepWalk), *node2vec*  has its origins in Natural Language Processing, as it adapts the idea of *Word2vec* (@Word2vec). 
+  *Word2vec* is a NLP model for learning word embeddings. It does so by inputing sentences of a text corpus into a DL Model called *skipgram*, with the fake task of attempting to predict the surrounding words in a context window, given a specific word (the word in the middle of this context window). The size of a context window has to be defined but it is simply the $n$ words surrounding the current target word in a sentence. 
+   
+  As an example, this will be shown with the following sentence:
+  
+\begin{quote}
+'Adopting a loudly barking dog as a pet is a good strategy to annoy the neighbours.'
+\end{quote}
+
+If we take 'dog' as the current target word and the context window size to be 4 (or $\pm 2$) and ignore prepositions (&etc.), the context window of 'dog' consist of the words 'loud(ly)', 'bark(ing)' and 'pet'. The desired result is therefore to predict those words as context when given the word 'dog', resulting in the embedding vectors of those context window words to be similar to that of 'dog'.
+  
 ## Random Walk
 
-  The Random Walk principle is to sample paths from a graph in order to estimate the proximity of a node pair.  
-
-  Similar to *DeepWalk* (@DeepWalk), the *node2vec* algorithm has its origins in Natural Language Processing, as it adapts the idea of *Word2vec* (@Word2vec). In NLP, tasks include to predict the surrounding words in a context window given a specific word. Or put simpler, prediction of context given a word. These context widows, often part-sentences or whole sentences, are input into a DL Model called *skipgram*. From this, a vector representation of a word is gained or a so called word-embedding. \textcolor{red}{todo source for skipgram}  
+  Adapting this *skipgram* architecture for use in node embedding poses a specific problem. In Text, there is a clear linearity and the context window is defined to be the words surrounding the current word. A network however, does not posses such a linear nature. Therefore, a context window equivalent has to be created.  
   
-  In *node2vec* and other RW based Node embedding models, artificial "sentence"-equivalents are created by sampling paths or walks within a graph. These paths are our context windows for the *skipgram* model and can be directly input as such.  
+  This is done by replacing sentences of a text corpus with node sequences sampled from a graph. The Random Walk principle is to sample these paths traversing a graph, in order to receive a linear sequence of visited nodes. Now the same context window concept can be used, defined as a neighbourhood $N_S(u)$, where $u$ shall be the current target node. The task of the model is then to predict the neighbourhood of a node, given this node.  
   
-   Each node is used as a starting point, from which neighbouring nodes are sampled in succession to obtain a path of desired length $l$.
+   To create Random Walks, each node is used as a starting point, from which neighbouring nodes are sampled in succession to obtain a path of desired length $l$.
   The probability to reach a node $x$ from a previous node $v$ is therefore given by the number of edges at the node $v$ and is 0 if $x$ and $v$ are not directly connected by an edge.
   More generally the probabilities are given by
   
@@ -211,13 +230,15 @@ However, the input to such models can also be paths sampled from a graph. These 
   \end{cases}
 \end{equation}
 
-where $c_i$ denotes the $i$th node of a RW, $\pi_{v,x}$ the transition probability from node $v$ to node $x$ and $Z$ a nomalizing constant. In the basic RW form, the transition probability is 1 if the graph is unweighted and $Z$ is the number of edges originating from node $v$. (@node2vec)  
+where $c_i$ denotes the $i$th node of a RW, $\pi_{v,x}$ the transition probability from node $v$ to node $x$ and $Z$ a normalizing constant. In the basic RW form, the transition probability is 1 if the graph is unweighted and $Z$ is the number of edges originating from node $v$. (@node2vec)  
   
-  In comparison to other strict searching algorithms to create neighbourhoods of nodes, there are clear spatial and time cost advantages of RW, as they can easily be parallelised and depending on the order and length of the RW do not need a lot of memory capacity. In addition, this technique usually does a decent job of capturing the structure of a graph, as the power-law remains. In simple terms, a well connected node will be visited more often. (@DeepWalk)  
+  In comparison to other strict searching algorithms to create neighbourhoods of nodes, there are clear spatial and time cost advantages of RW, as they can easily be parallelized and, depending on the order and length of the RW, do not need a lot of memory capacity. In addition, this technique usually does a decent job of capturing the structure of a graph, as the power-law remains. In simple terms, a well connected node will be visited more often. (@DeepWalk)  
   
 ### RW in node2vec
 
-  The *node2vec* model is a slight modification of a basic Random Walk. Here, two parameters are introduced to modify a RW. These modifiers, typically denoted $p$ and $q$, add a bias to the sampling of nodes during the RW in order to control mostly the locality of the walk. This results in a mixture of BFS and DFS and can therefore represent different types of network neighbourhoods and node equivalences (@node2vec).
+  Similar to other RW based node embedding models, *node2vec* uses these artificial "sentence"-equivalents of paths as an input to the *skipgram* model.
+  However, the *node2vec* RW is a slight modification of a basic Random Walk. Here, two parameters are introduced to modify a RW. These modifiers, typically denoted $p$ and $q$, add a bias to the sampling of nodes during the RW in order to control mostly the locality of the walk. This results in a mixture, and control thereof, of BFS and DFS and can therefore represent different types of network neighbourhoods and node equivalences (@node2vec).  
+  
   The random walk is of 2\textsuperscript{nd} order, meaning that the previous node visited has an impact on the sampling of the next node of a RW traverse. In this case, the probability of a node $x$ to become the next node in the RW {$..., t, v$}, is biased not only by the weight of the edge ($v$, $x$) ($w_{i,j} = 1; \forall{i, j \in V}$ if the graph is unweighted), but also by the distance to the previous node $d_{t, x}$, where
   
 $$
@@ -229,11 +250,18 @@ $$
 \end{cases}
 $$
 
-  This bias $\alpha$ is then multiplied by the weight of the edge $w_{v,x}$ to obtain $\pi_{v,x}$ of equation \ref{eqn:RWprob}.
-  $p$, also called the Return Parameter (@node2vec), defines the probaility of backtracing a step, while $q$, also called the In-Out Parameter (@node2vec), controls the exploratory nature of the walk. Setting $p$ low and $q$ high therefore keeps the walk very local, whilst a high $p$ almost acts like a small self-avoiding-walk (@saw) and a low $q$ ensures that the walk travels further outward from the starting node.
+  This bias $\alpha$ is then multiplied by the weight of the edge $w_{v,x}$ to obtain $\pi_{v,x}$ of equation \ref{eqn:RWprob}.  
+  $p$, also called the Return Parameter, defines the probability of backtracking a step, while $q$, also called the In-Out Parameter, controls the exploratory nature of the walk. (@node2vec)  
+  
+  Setting $p$ low and $q$ high therefore keeps the walk very local, whilst a high $p$ almost acts like a small self-avoiding-walk (@saw) and a low $q$ ensures that the walk travels further outward from the starting node.
+  As mentioned above, choosing these parameters leads to a tuned trade-off between BFS and DFS. This behaviour can be exploited in order to represent either node proximity or structural node proximity, depending on what is desired for a downstream task. (@node2vec)  
+  
+<br/>
+  
+  Example Graph \ref{fig:exGraph} shows an example of the RW bias $\alpha$. Consider $t$ to be the node last visited and $v$ the current node. The possible next nodes in this RW are therefore $t, x1, x2$ and $x3$ with their respective bias $\alpha$ displayed on the edge.
   
   
-```{r exGraph, fig.cap = "Random example Graph"}
+```{r exGraph, fig.cap = "\\label{fig:exGraph}Example Graph to show the pobabilty bias of the node2vec RW"}
 
 include_graphics("plots/exGraph.pdf")
 
@@ -241,56 +269,110 @@ include_graphics("plots/exGraph.pdf")
   
 ## SkipGram
 
-  \emph{node2vec} like many other RW-based DL embedding methods, utilizes a variation of skipGram as the DL model (@survey).
-  SkipGram originates in NLP with word embeddings. The model attempts to predict surrounding words of a certain range in a sentence, given a current word. The current word is used as an input to a log-linear classifier.
-  Projecting this method to the task of graph prediction, a RW is to be interpreted as a sentence and a node as a word. SkipGram can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. 
-  So, let $N(u)$ be the neighborhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
-  The objective function results in
+  *node2vec* like some other RW-based DL embedding methods, utilizes a variation of *skipgram* as the DL model (@survey).
+  As mentioned, *skipgram* originates in NLP and is used in *Word2vec* to obtain word embeddings. The model attempts to predict surrounding words of a certain range in a sentence, given a current word. 
+  In this model the hidden layer is comprised of vector representations for each of the words, so called word embeddings. 
+  These are created, because, in order to predict the context of a word, it attempts to represent words in the so called context window of a target word similarly to this specific word, resulting in a similar feature representations of those words. It does so, by maximizing the log probability to observe feature representations of words in the context window, given the feature representation of a word in what is hereinafter referred to as the *skipgram* objective function.  
+  
+<br/>
+
+  Projecting this method onto the task of node embedding, a RW is to be interpreted as a sentence and a node as a word. *skipgram* can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. 
+  So, let $N(u)$ be the neighbourhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
+  The adapted *skipgram* objective function then results in
 
 \begin{equation}
 \label{eqn:objecfun}
-  \max_{f} \sum_{u \in V} log(P(N(u)|f(u)))
+  \max_{f} \sum_{u \in V} log(P(N_S(u)|f(u)))
 \end{equation}
 
-To simplify, we assume conditional indepence in a neighbourhood so that the likelihood to observe a neighbourhood can be defined by factorizing over the likelihoods to observe each neighbourhood node. 
+To simplify, we assume conditional independence in a neighbourhood so that the likelihood to observe a neighbourhood can be defined by factorizing over the likelihoods to observe each neighbourhood node $n_i$. 
 
 $$
-log(P(N(u)|f(u))) = \prod_{n_i\in N(u)} P(n_i|f(u))
+P(N(u)|f(u)) = \prod_{n_i\in N_S(u)} P(n_i|f(u))
 $$
  Also, we define the conditional likelihood between two nodes as a softmax equation.
  
 $$
-P(n_i|f(u)) = \frac{exp(f(ni) * f(u))}{\sum_{v\in V} exp(f(v) * f(u))}
+P(n_i|f(u)) = \frac{exp(f(n_i) * f(u))}{\sum_{v\in V} exp(f(v) * f(u))}
 $$
-  These assumptions transform the objective function \ref{eqn:objecfun} to
+  These assumptions transform the objective function \ref{eqn:objecfun} into
+  
 
 $$
-\max_{f} \sum_{u \in V} -log \left( \sum_{v \in V} exp(f(v) * f(u)) \right) + \sum_{n_i\in N(u)} f(n_i) * f(u)
+\max_{f} \sum_{u \in V} -log \left( \sum_{v \in V} exp(f(v) * f(u)) \right) + \sum_{n_i\in N_S(u)} f(n_i) * f(u)
 $$
-  
-  \textcolor{red}{dunno bout this following paragraph}
-  The node-neighbourhoods in \emph{node2vec} are defined by the Random Walks, so one can observe, how the walk defining parameters $p$ and $q$ directly effect the embedding, as nodes with similar neighbourhoods will end up with similar feature representations.
   
 ### Negative Sampling
 
-\textcolor{red}{TODO}
+  However, the first sum of the objective function of the skipgram model, also called the per-node partition function by @node2vec, $\sum_{v \in V} exp(f(v) * f(u))$, is very expense to compute directly, as it necessitates calculating a $|V|$-way softmax equation every iteration. In addition, even though all weights are recalculated every step, most weights will not be altered by a relevant amount.  
 
-  However, the first sum, also called the per-node partition function 
-$\sum_{v \in V} exp(f(v) * f(u))$ is too expense to compute directly, so \emph{node2vec} utilizes negative sampling to estimate this function.
+<br/>
+
+  @Word2vec2 propose two different methods to optimize this for *Word2vec*. The first being a hierarchical softmax, which utilizes the structure of a binary tree to cut the amount of evaluations per iteration from $|V|$ to approximately $log_2(|V|)$.  
+  
+  While *DeepWalk* uses this method of softmax simplification, *node2vec* implements the second suggested method, called negative sampling (NEG), which is a simplification of Noise Contrastive Estimation (NCE). (@nce, @nceAppl)  
+  
+NCE proposes, that, using logistic regression, data should be separable from noise. (@Word2vec2)
+NEG adapts this idea by constructing input data for a logistic regression, combining a context object (expected output of regression = 1) with $k$ sampled negative objects (expected output of regression = 0). In the case of word embedding, objects here refer to words and the context word would be words of the context window for a target word, while negative words any other words in the text corpus.
+This easily translates into node embedding with RW, as the context nodes are simply the next nodes (dependent on context window size) of the current path.  
+
+<br/>
+
+\textcolor{red}{example}  
+
+<br/>
+
+  Not only does this transform a $|V|$-way softmax equation into $|V|$ number of logistic regressions, which are inherently more efficient, but by limiting the $k$ number of negative sample nodes, we limit the number of weights revalued and adjusted, drastically reducing the complexity even further. @Word2vec2 suggests a $k$ of 5-20 negative samples for smaller datasets and that 2-5 negative samples can be sufficient for larger datasets. The original python *node2vec* implementation by @node2vec keeps the default setting of $k = 5$ from the *Word2vec* implementation of the  *Gensim* python library. (@gensim) 
+
+<br/>
+
+  A free parameter of NEG is the distribution from which the negative samples are pulled, also named the noise distribution $P_n(v)$. According to @Word2vec2, a Unigram distribution in which the proportional frequency of a word in the corpus (here the proportional frequency of a node appearing in all of the random walks) is considered, is recommended. Specifically, they say that a Unigram distribution raised to $\frac{3}{4}$ths power performs the best. This way, less frequent words tend to be sampled more often. Again, this is the default for the *Word2vec* implementation used and therefore also the noise distibution used in the *node2vec* implementation.  
+  
+  So the probability of sampling node $u$ is described by $P_n(u)$, where:
+
+
+$$
+P_n(u) = \frac{f(u)^{\frac{3}{4}}}{\sum_{j=0}^{|V|}{\left(f(v_j)^{\frac{3}{4}}\right)}}
+$$
+and $f(x)$ equals the number of appearances of node $x$ in all of the random walks.  
+
+<br/>
+
+  Applying NEG to the created Random Walks by *node2vec*, the new objective is therefore to maximize
+
+\begin{equation}
+\label{eqn:NEG}
+  \log \sum_{n_i \in N_S(u)} \sigma (f(n_i) * f(u)) + \sum_{j = 1}^{k}{\mathbb{E}_{v_j \sim P_n(v)}\left( \sigma(-f(v_j)*f(u)) \right)}
+\end{equation}
+
+for every node $u$, with $\sigma(x) = \frac{1}{1+e^{-x}}$. Or in words, attempt to have the logistic regression return 1 for all $(f(n_i) * f(u))$ and 0 for all $(-f(v_j)*f(u))$, where $v_j$ are the negative sampled nodes for $u$ and $n_i$ a neighbourhood node of $u$. That is to say, we optimize the embedding function $f$ such that the feature representation of a given node is as similar as possible to those of its neighbourhood nodes, whilst those of the negative sampled nodes are as dissimilar as possible.
+
+Generalizing equation \ref{eqn:NEG} to the general objective function of the model results in:
+
+\begin{equation}
+\label{eqn:objecfunfinal}
+  \max_f \left[ \sum_{u \in V} \left( \log \sum_{n_i \in N_S(u)}\sigma (f(n_i) * f(u)) + \sum_{j = 1}^{k}{\mathbb{E}_{v_j \sim P_n(v)}\left( \sigma(-f(v_j)*f(u)) \right)} \right)\right]
+\end{equation}
+
+Parameters $\theta$ for embedding function $f$ are then optimized using gradient ascent. (@node2vec)
+
 
 ## Extensions and Applications
 
-\textcolor{red}{TODO}
+  There have been multiple proposals of *node2vec* extensions and add-ons for various applications. A few examples of this will be briefly named in the following.
 
-  @node2vec have also shown, how when adapting the *node2vec* model to represent a pair of nodes (an edge) in the feature space, it then also lends itself to tasks such as link prediction.
+  @node2vec themselves have shown, how, when adapting the *node2vec* model to represent a pair of nodes (an edge) in the feature space as one vector, the model then also lends itself to tasks such as link prediction.  
   
-  LSTM node2vec combination
+  *node2vec* has been demonstrated to be useful in predictive modelling, such as to predict demographic information as well as likelihood of a customer to churn in a call network. (@telco and @telco2)  
   
-  Walklets
+  @fmri develop a *multi-node2vec* algorithm, capable of embedding a multi-layered network in order to analyse fMRI scans in schizophrenia patients.  
   
-  RW with skips
+  A dynamic extension of *node2vec*, named *LSTM-node2vec*, has also been proposed, where the *node2vec* model is augmented with an *LSTM* model to capture temporal changes and enable dynamic embedding. (@LSTM-node2vec)
+
+  Additionally, there are multiple proposed models, that utilize the RW principle. @Walklets for example present *Walklets*, an algorithm that skips over steps of Random Walks, which can be applied to the RW of *node2vec* as well.
 
 # Outlook into other RW models
+
 
 \textcolor{red}{TODO}
 
@@ -298,6 +380,6 @@ $\sum_{v \in V} exp(f(v) * f(u))$ is too expense to compute directly, so \emph{n
   - introduce LSTM
   - explain tasks associated
   
-
+# Summary
 
 \section{References}
