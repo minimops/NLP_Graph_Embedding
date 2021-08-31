@@ -197,6 +197,12 @@ Scalability as well as required computational performance may additionally be in
   
   *node2vec* (@node2vec) is an example of such a Random Walk based DL approach to Graph Embedding. It usually represents nodes of a Graph in the feature space and is therefore a node embedding model. 
   
+```{r skipGramEx, fig.scap = "Visualization of node2vec algorithm", fig.cap = "\\label{fig:skipGramEx}Borrowed from Cohen (2018). This is crude visual representation of how node2vec embeds nodes of a graph into a feature space using RW.", fig.align = "center"}
+
+include_graphics("plots/n2vecskipgram.png")
+
+```
+  
 ## Word2vec summary
 
   Similar to *DeepWalk* (@DeepWalk), *node2vec*  has its origins in Natural Language Processing, as it adapts the idea of *Word2vec* (@Word2vec). 
@@ -275,11 +281,6 @@ include_graphics("plots/exGraph.pdf")
   As mentioned, *skipgram* originates in NLP and is used in *Word2vec* to obtain word embeddings. The model attempts to predict surrounding words of a certain range in a sentence, given a current word. 
   In this model vector representations for each of the words are created, so called word embeddings. 
   These are created, because, in order to predict the context of a word, it attempts to represent words in the so called context window of a target word similarly to this specific word, resulting in a similar feature representations of those words. It does so, by maximizing the log probability to observe feature representations of words in the context window, given the feature representation of a word in what is hereinafter referred to as the *skipgram* objective function.  
-```{r skipGramEx, fig.scap = "Visualization of node2vec algorithm", fig.cap = "\\label{fig:skipGramEx}Borrowed from Cohen (2018). This is crude visual representation of how node2vec embeds nodes of a graph into a feature space using RW.", fig.align = "center"}
-
-include_graphics("plots/n2vecskipgram.png")
-
-```
 
   Projecting this method onto the task of node embedding, a RW is to be interpreted as a sentence and a node as a word. *skipgram* can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. Figure \ref{fig:skipGramEx} portrays a simplification of the *node2vec* algorithm.  
   So, let $N_S(u)$ be the neighbourhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
