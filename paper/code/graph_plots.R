@@ -24,8 +24,8 @@ exGraph <- rbindlist(list(list(from = NULL, to = NULL, prob = NULL),
 
 net = network(exGraph, directed = FALSE)
 
-ggnet2(net, label = TRUE, edge.label = exGraph$prob)
+ggnet2(net, label = TRUE, edge.label = exGraph$prob, size = 8, mode = "kamadakawai")
 
-ggsave(paste0(rmdPath, "plots/exGraph.pdf"), device = "pdf")
+ggsave(paste0(rmdPath, "plots/exGraph.pdf"), device = "pdf", width = 2.9, height = 2.9)
 
 ###

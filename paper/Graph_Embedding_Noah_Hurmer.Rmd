@@ -37,7 +37,7 @@ abstract: Graphs appear in all types of contexts and fields, as they embody the 
 
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo = FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.pos = "H", out.extra = "")
+knitr::opts_chunk$set(echo = FALSE, fig.pos = "h", out.extra = "")
 library(tidyverse)
 library(data.table)
 library(checkmate)
@@ -90,8 +90,7 @@ Graphs exist naturally quite often as a data structure in various fields, descri
 
 ## Data structure
 
-  Graphs are a type of data structure that consist of so called nodes (or vertices) and edges. Therefore, a graph $G$ is usually noted as $G=(V, E)$. Here, $V$ is the set of nodes and $E$ the set of edges.
-  \textcolor{red}{source}  
+  Graphs are a type of data structure that consist of so called nodes (or vertices) and edges. Therefore, a graph $G$ is usually noted as $G=(V, E)$. Here, $V$ is the set of nodes and $E$ the set of edges. (@survey)  
   
   Nodes typically represent some form of object or entity. This can range from a physical object, component or location to theoretical concepts. The data form of a node is therefore generally not limited to any specific form, and can be anything from text to images, videos, lists and many more.  However, most embedding and downstream tasks only deal with a label per node, as the data it represents is often not necessarily required.  
   
@@ -103,14 +102,11 @@ Graphs exist naturally quite often as a data structure in various fields, descri
   
   In addition, an edge between two nodes can be weighted, where it receives a numerical label. This can represent concepts such as a cost of traversal, distance or capacity. Generally, it gives the relation of the graph a (metric) scale. This type of graph is then called a weighted Graph.
   A simple example of this might be a road network. Here nodes can represent intersections or cities, dependent on the scale and edges connecting roads or highways. The roads can then be attributed with a time cost to use them.
- \textcolor{red}{sources}
   
-  Graphs may also be of heterogeneous mode, meaning different types or classes of nodes as well as edges can exist in a single graph. This is useful to embody networks of different interactions or effects from objects to one another. A very basic example of a heterogeneous graph is a simple semantic graph, which represents semantic relationships such as "is a" or "has" and so forth.
-  \textcolor{red}{sources, maybe example graph plot}  
+  Graphs may also be of heterogeneous mode, meaning different types or classes of nodes as well as edges can exist in a single graph. This is useful to embody networks of different interactions or effects from objects to one another. A very basic example of a heterogeneous graph is a simple semantic graph, which represents semantic relationships such as "is a" or "has" and so forth. (@survey)
+  \textcolor{red}{maybe example graph plot}  
   
   To return to the example of social networks however, these are also often heterogeneous. An example we will return to later is a so-called cQA or community Question and Answer forum. These typically have Objects of the classes "Question", "Answer" and "Profile", as well as edges such as "asked", "answered", "follows", "upvoted" and possibly more.
-  \textcolor{red}{source}
-  
 
 # Embedding
 
@@ -118,7 +114,7 @@ Graphs exist naturally quite often as a data structure in various fields, descri
 
 ## Motivation
 
-  Two of the main issues with data in the form of a graph are its inherent structure and the limited applicable mathematics available to deal with that. Additionally, the computational challenge associated with any type of storage or calculation performed on it poses a problem.
+  Two of the main issues with data in the form of a graph are its inherent structure and the limited applicable mathematics available to deal with that. Additionally, the computational challenge associated with any type of storage or calculation performed on it poses a problem. (@survey)
   
   The above described composition of a graph is usually stored in a so called adjacency matrix, with the dimensions of $N\times N$, where $N$ is the number of nodes in the graph. The edges are then captured with a binary indicator (or a value for a weighted edge), whether or not two nodes are connected via an edge.
   The sheer size of such matrices can quickly become a problem both in form of (dynamic) storage space but also computational expense. 
@@ -126,34 +122,28 @@ Graphs exist naturally quite often as a data structure in various fields, descri
   Therefore we aim to compress the information of a graph down to lower dimensions and into a form that lets us better apply analysis tools. Usually a two dimensional vector space is selected as the embedding dimension. This projects the graph into an euclidean space and enables the application of a distance metric between objects in that space, enabling downstream tasks that rely on this.  
   
   Moreover, as long as the graph does not change, once a graph has been embedded, multiple tasks and calculations can be performed without the need to embed anew, resulting in a performance gain.  
-  
-  \textcolor{red}{source}
 
 ## Types and Applications
 
   There are different forms of graph embedding, each with their own uses and specific tasks. These are usually coupled with the structure that is preserved.
   
-  Entire graphs can be embedded into a low dimensional vector space in order to compare different graphs to each other. Similar graphs are embedded close to each other. This can for example be useful for biologists to compare proteins or predict their functional labels. Here, a complex protein can be represented structurally by a single graph which will then be embedded to a single vector.
-  \textcolor{red}{source}
+  Entire graphs can be embedded into a low dimensional vector space in order to compare different graphs to each other. Similar graphs are embedded close to each other. This can for example be useful for biologists to compare proteins or predict their functional labels. Here, a complex protein can be represented structurally by a single graph which will then be embedded to a single vector. (@protein)  
   
   The most common way of graph embedding is to embed the nodes of a graph. Here, each node is represented as a vector in a low dimensional space, where embeddings of similar or close nodes are located close to each other. This proximity can be defined in different ways. A typical metric for this is a proximity of order $n$, which describes the similarity of the $n$-order neighbourhoods of the respective nodes.  
   
-  Node embedding can then be used for various downstream tasks such as node classification or clustering, in which one aims to group, categorize or label the objects of a network. Data compression or dimensionality reduction and visualization are other applications for node embedded graphs.
-  \textcolor{red}{source}
+  Node embedding can then be used for various downstream tasks such as node classification or clustering, in which one aims to group, categorize or label the objects of a network. Data compression or dimensionality reduction and visualization are other applications for node embedded graphs. (@survey and @node2vec)
   
   A different approach is to embed the edges between nodes. The so called edge- or knowledge embedding aims to preserve relations between node pairs. This is particularly useful to predict missing or validate existing links in a graph, in tern to possibly predict missing relations between entities. Typically, this is done by embedding the tupel $<a, b>$ of nodes $a$ and $b$ respectively, or the triple $<a, t, b>$ if the graph is heterogeneous, where $t$ represents the edge between the two nodes.
-  Applications of link predictions range from suggestions on social media sites to predicting interactions of proteins or drugs.
-  \textcolor{red}{sources}
+  Applications of link predictions range from suggestions on social media sites to predicting interactions of proteins or drugs. (@GOYAL201878)
   
-  It is also possible to embed subgraphs or groups (communities) of a graph separately. This technique mostly finds its uses in community detection of a network, question answering and semantic searches. Often it is paired with a form of node embedding.
-  \textcolor{red}{multiple sources here}
+  It is also possible to embed subgraphs or groups (communities) of a graph separately. This technique mostly finds its uses in community detection of a network, question answering and semantic searches. Often it is paired with a form of node embedding. (@survey)
   
 
 ## Techniques
 
-There are several different approaches used to embed a graph. As mentioned above, different tasks require different information to be preserved about the graph. So mostly, a given model is  designed for a specific task or goal and thus the type of input graph it can accept is often limited. \textcolor{red}{missing something here}
-  
-Embedding models are generally summarized into the following categories.  
+There are several different approaches used to embed a graph. As mentioned above, different tasks require different information to be preserved about the graph. So mostly, a given model is  designed for a specific task or goal and thus the type of input graph it can accept is often limited.
+
+  Embedding models are generally summarized into the following categories. (@survey)  
 
 ### Matrix Factorization
   
@@ -251,12 +241,14 @@ $$
   Setting $p$ low and $q$ high therefore keeps the walk very local, whilst a high $p$ almost acts like a small self-avoiding-walk (@saw) and a low $q$ ensures that the walk travels further outward from the starting node.
   As mentioned above, choosing these parameters leads to a tuned trade-off between BFS and DFS. This behaviour can be exploited in order to represent either node proximity or structural node proximity, depending on what is desired for a downstream task. (@node2vec)  
   
+  @node2vec propose to tune the hyperparameters $p$ and $q$ via Grid search over the values $\{0.25, 0.5, 0.75, 1, 2, 4\}$. They show, how specifically selecting these can lead to either different behaviours with the example of the Les Misérables coappearance network (@lesmis). Selecting a $q$ of $\frac{1}{2}p$ results in similar communities of characters that frequently engage, a sort of homophily structure, whereas selecting $q$ as $2p$ resembles structural similarities, embedding characters with similar functions (such as community bridging characters) close together. Other parameters of *node2vec*`s RW include the number as well as the length of conducted walks.
+  
 <br/>
   
   Example Graph \ref{fig:exGraph} shows an example of the RW bias $\alpha$. Consider $t$ to be the node last visited and $v$ the current node. The possible next nodes in this RW are therefore $t, x1, x2$ and $x3$ with their respective bias $\alpha$ displayed on the edge.
   
   
-```{r exGraph, fig.cap = "\\label{fig:exGraph}Example Graph to show the pobabilty bias of the node2vec RW"}
+```{r exGraph, fig.scap = "node2vec RW probability bias", fig.cap = "\\label{fig:exGraph}Example Graph to show the pobabilty bias of the node2vec RW. The labels on the edges represent the RW bias alpha, dependent on hyperparameters p and q. In this example, v represents the current node, while t the last visited node.", fig.align = "center"}
 
 include_graphics("plots/exGraph.pdf")
 
@@ -372,11 +364,11 @@ Parameters $\theta$ for embedding function $f$ are then optimized using gradient
 
 ## cQA
 
-  So called community based question-answering (cQA) forums are websites where users can formulate questions, that can then later be answered by other users, resulting in a internet based crowdsourcing service for information and help. (TODOSOURCE1)  
+  So called community based question-answering (cQA) forums are websites where users can formulate questions, that can then later be answered by other users, resulting in a internet based crowdsourcing service for information and help. (@hsnl)    
   
-  Examples of such websites are *Yahoo! Answers*, *Quora*, and *Stack Exchange*. This concept has gained quite a lot of popularity and clout recently and the benefits of such a system has been proven by (TODOSOURCE2).  
+  Examples of such websites are *Yahoo! Answers*, *Quora*, and *Stack Exchange*. This concept has gained quite a lot of popularity and clout recently and the benefits of such a system has been proven by (@temp2).  
   
-  The downstream tasks of embedding question and answer pairs is mostly to match these together or to suggest already existing posts similar to a posed question. This was typically achieved using NLP models such as word or sentence embedding to label posted questions or answers with context(s), using this label to them match up or suggest. (TODOSOURCE)  
+  The downstream tasks of embedding question and answer pairs is mostly to match these together or to suggest already existing posts similar to a posed question. This was typically achieved using NLP models such as word or sentence embedding to label posted questions or answers with context(s), using this label to them match up or suggest. 
   
   However, the inherent network like structure of cQA sites becomes apparent when the layer of users is factored in, where we gain the information of 'who asked what' or 'who answered on what topic'. Additionally, often users are given the option to up- or downvote (also sometimes called 'like' or similar) answers as well as follow other users, permitting a social structure, leading to a heterogeneous graph structure.
   Not to mention, that often such forums have a multithread like structure, as one can submit questions to a given answer on a different question for example, as well as referring to other threads leading to interconnections between posts, deviating from a linear question to answer thread.  
@@ -389,7 +381,7 @@ Parameters $\theta$ for embedding function $f$ are then optimized using gradient
   
   Both of which utilize a RW strategy over such cQA networks. The heterogeneous structure simply has the effect of a path consisting of questions, answers and users as nodes. Equivalently, both models then input this sampled paths into an Long Short Term Memory (LSTM) Model.
   
-  An LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (TODOSOURCE), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (TODOSOURCE), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
+  An LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (@lstmconcept), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (@vanigrad), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
   Such models are already widely used in NLP related embedding tasks, where words are input in a sequence (that of the sentence or context windows) to retrieve word embeddings for example. For cQA related tasks, @expert pre-train word embeddings to then enter a the sequence of embedding representations of the words of a question into an LSTM model, to achieve semantic embedding of a question. This is then combined with a user embedding matrix with a relative ranking loss function, to achieve cQA
 network embedding with question representation and relative quality rank.  
 Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question ans answer is calculated, as well as a loss function is trained with all three feature representation types.
