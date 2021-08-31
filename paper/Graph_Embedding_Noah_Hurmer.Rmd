@@ -1,7 +1,7 @@
 ---
 title: |
   ![](assets/lmu.jpg)
-  NLP - Graph Embedding
+  From Word- to Graph Embedding
 subtitle: |
   | A Brief Introduction into GE Models utilizing Random Walk
   |
@@ -9,7 +9,7 @@ subtitle: |
   |
   | Supervisor: M.Sc. Matthias Assenmacher
 author: "Noah Hurmer"
-date: "tbd"
+date: "31.08.2021"
 output:
   pdf_document:
     fig_caption: yes
@@ -31,7 +31,7 @@ bibliography: references.bib
 
 nocite: '@*'
 
-abstract: \textcolor{red}{TODO}
+abstract: Graphs appear in all types of contexts and fields, as they embody the structure of networks, such as online social networks, word co-occurrences, biological structures and interactions or commerce and advertising structures to name a few. To enable performant and efficient handling of such a data structure, information of a graph is embedded into a defined feature space. This then lends itself to downstream tasks such as labelling, classification, clustering, link prediction and semantic searches. NLP and its associated task of word embedding have birthed embedding models such as *Word2vec* (@Word2vec). This architecture was then adapted for general graph embedding use with the help of the Random Walk concept. The example of this given here will be *node2vec* (@node2vec). In this report, we start from the beginning, as we introduce graphs, explain their composition and structure, continue on to known embedding types and techniques and explore *node2vec* in detail.
 ---
 \newpage
 
@@ -62,8 +62,8 @@ library(kableExtra)
 
 ```{r abbreviations, echo=FALSE}
 data.table(
-  Term = c("GE", "DL", "RW", "NCE", "NEG", "BFS", "DFS", "LSTM", "RNN", "cQA"),
-  Abbreviation = c("Graph Embedding", "Deep Learning", "Random Walk", "Noise Contrastive Estimation", "Negative Sampling", "Breadth First Search", "Depth First Search", "Long short-term memory", "Recurrent Neural Network", "Community-Based Question Answering")) %>%
+  Term = c("GE", "DL", "RW", "NCE", "NEG", "BFS", "DFS", "LSTM", "RNN", "cQA", "HSNL", "RMNL", "CEC", "MF", "SVD", "AI"),
+  Abbreviation = c("Graph Embedding", "Deep Learning", "Random Walk", "Noise Contrastive Estimation", "Negative Sampling", "Breadth First Search", "Depth First Search", "Long short-term memory", "Recurrent Neural Network", "Community-Based Question Answering", "Heterogeneous Social Network Learning", "Ranking Metric Network Learning", "Constant Error Carousel", "Matrix Factorization", "Singular Value Decomposition", "Artificial Intelligence")) %>%
   arrange(Term) %>%
   kable(booktabs = TRUE, format =  "latex", escape = FALSE, linesep = "") %>%
   kable_styling(latex_options = c("repeat_header", "striped"), full_width = TRUE)
@@ -78,17 +78,15 @@ data.table(
 
 # Introduction
 
-\textcolor{red}{Dont really know what to put here yet tbh.}
+Graphs exist naturally quite often as a data structure in various fields, describing structures of networks. This can represent social networks or biological composition of proteins and their interaction as well as linguistic concepts such as language and word use therein. As understanding these structures and interactions is necessary to perform various tasks on or with these networks, graph analytics is essential. However, traditional graph analytics suffer from computational limitations. This leads to an ever increasing popularity of graph embedding (GE) models, projecting and compressing the information of a network in a feature space of defined dimensions, allowing simple applications of downstream tasks such as classification and prediction.  
 
+  As mentioned, language, or more specifically a text corpus can also be represented as a network, for instance one of word co-occurrences. Natural Language Processing (NLP) aims to equip AI with the ability to understand and apply human language, intern necessitating the need to efficiently deal with such an abstract network concept of language. Representing words as vectors in a feature space, so called word embedding, is often a step in achieving this goal. Based on this idea, general graph embedding methods have been proposed, adapting preconstructed word embedding models to accept general network data with the aid of the Random Walk (RW) concept. *DeepWalk* (@DeepWalk) and *node2vec* (@node2vec) are examples of such NLP derived RW assisted GE models.
+  
 ## Orginization
 
-\textcolor{red}{TODO write out}
+  In this report, section \ref{introduction} introduces the concept of a graph, its structure, uses and limitations, as well as explain different graph types and their impact on downstream tasks. Following that, in section \ref{embedding} we explore graph embedding in detail, exploring different types and their often bound applications. Furthermore we briefly mention different techniques to embed. Section \ref{node2vec} then dives into NLP derived Graph embedding models using Random Walks with the example of *node2vec*.
+  Finally, a tie-in of RW based graph embedding back into an NLP task will be discussed in section \ref{outlook-into-rw-based-cqa-embedding-models} as an outlook, where we look at tasks associated with community based question-answer forums.
 
-  - written table of context
-  - section 1 describes graphs their types and applications
-  - section 2 embedding motivation, types and associated downstream tasks
-  - section 3 shows the use of a Random Walk in order to use a DL model to embed with the example of node2vec
-  - section 4 tries to tie back into NLP, showing RW principles at work in order to perform cQA related tasks
 
 ## Data structure
 
@@ -116,9 +114,7 @@ data.table(
 
 # Embedding
 
-  Embedding refers to the representation of an object by another object. Typically, this representation is a two-dimensional vector.  
-  
-  \textcolor{red}{Dunno bout this part.}
+  Embedding refers to the representation of an object by another object. In this scenario, it means representing objects with a vector of dimensionality $d$ in a feature space. Similar objects are hereby to be represented similarly.
 
 ## Motivation
 
@@ -161,10 +157,9 @@ Embedding models are generally summarized into the following categories.
 
 ### Matrix Factorization
   
-This technique mostly represents the beginnings of GE and has the disadvantage of high computational and storage cost, as a Matrix of pairwise node similarity is constructed, that is then factorized to obtain the embedding of each node.
-\textcolor{red}{explain this more}
+This technique mostly represents the beginnings of GE and has the disadvantage of high computational and storage cost, as a Matrix of pairwise node similarity is constructed, that is then factorized to obtain the embedding of each node. In essence, it represents a structure-preserving dimensionality reduction problem. Earlier MF models calculate corresponding eigenvectors by factorising graph Laplacian Eigenmaps. Others try to form embeddings by directly factorising node proximity matrices, such as the adjacency matrix using SVD as an example. (@survey and @NLPBook)
     
-Due to the fact that all node-pairs are considered (unlike other techniques), it can be quite performant, however the cost disadvantages make this largely infeasible for larger graphs.  
+Due to the fact that all node-pairs are considered (unlike other techniques), it can be quite performant, however the cost disadvantages make this largely infeasible for larger graphs. It mostly finds its use for homogeneous, non-relational graphs. (@survey)
     
   
 ### Deep Learning
@@ -347,7 +342,7 @@ and $f(x)$ equals the number of appearances of node $x$ in all of the random wal
 
 for every node $u$, with $\sigma(x) = \frac{1}{1+e^{-x}}$. Or in words, attempt to have the logistic regression return 1 for all $(f(n_i) * f(u))$ and 0 for all $(-f(v_j)*f(u))$, where $v_j$ are the negative sampled nodes for $u$ and $n_i$ a neighbourhood node of $u$. That is to say, we optimize the embedding function $f$ such that the feature representation of a given node is as similar as possible to those of its neighbourhood nodes, whilst those of the negative sampled nodes are as dissimilar as possible.
 
-Generalizing equation \ref{eqn:NEG} to the general objective function of the model results in:
+Generalizing equation \ref{eqn:NEG} to the general objective function of the model results in: (@goldberg2014word2vec)  
 
 \begin{equation}
 \label{eqn:objecfunfinal}
@@ -371,15 +366,36 @@ Parameters $\theta$ for embedding function $f$ are then optimized using gradient
 
   Additionally, there are multiple proposed models, that utilize the RW principle. @Walklets for example present *Walklets*, an algorithm that skips over steps of Random Walks, which can be applied to the RW of *node2vec* as well.
 
-# Outlook into other RW models
+# Outlook into RW based cQA Embedding Models
 
+  In this section we go full circle, introducing RW based graph embedding augmentations to embedding cQA networks in order to improve NLP related tasks over such networks.
 
-\textcolor{red}{TODO}
+## cQA
 
-  - elaborate on cQA
-  - introduce LSTM
-  - explain tasks associated
+  So called community based question-answering (cQA) forums are websites where users can formulate questions, that can then later be answered by other users, resulting in a internet based crowdsourcing service for information and help. (TODOSOURCE1)  
+  
+  Examples of such websites are *Yahoo! Answers*, *Quora*, and *Stack Exchange*. This concept has gained quite a lot of popularity and clout recently and the benefits of such a system has been proven by (TODOSOURCE2).  
+  
+  The downstream tasks of embedding question and answer pairs is mostly to match these together or to suggest already existing posts similar to a posed question. This was typically achieved using NLP models such as word or sentence embedding to label posted questions or answers with context(s), using this label to them match up or suggest. (TODOSOURCE)  
+  
+  However, the inherent network like structure of cQA sites becomes apparent when the layer of users is factored in, where we gain the information of 'who asked what' or 'who answered on what topic'. Additionally, often users are given the option to up- or downvote (also sometimes called 'like' or similar) answers as well as follow other users, permitting a social structure, leading to a heterogeneous graph structure.
+  Not to mention, that often such forums have a multithread like structure, as one can submit questions to a given answer on a different question for example, as well as referring to other threads leading to interconnections between posts, deviating from a linear question to answer thread.  
+  
+  Contextual labelling combined with graph embedding then not only leads to the possibility of improving the performance of above mentioned existing tasks, but also exposes new possible tasks such as finding or ranking users as experts on topics. (@expert)  
+
+## LSTM
+  
+  In the following, two proposed models will be used to explain this hybrid idea of graph embedding, namely Heterogeneous Social Network Learning (HSNL) and Ranking Metric Network Learning (RMNL). (@hsnl and @expert)  
+  
+  Both of which utilize a RW strategy over such cQA networks. The heterogeneous structure simply has the effect of a path consisting of questions, answers and users as nodes. Equivalently, both models then input this sampled paths into an Long Short Term Memory (LSTM) Model.
+  
+  An LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (TODOSOURCE), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (TODOSOURCE), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
+  Such models are already widely used in NLP related embedding tasks, where words are input in a sequence (that of the sentence or context windows) to retrieve word embeddings for example. For cQA related tasks, @expert pre-train word embeddings to then enter a the sequence of embedding representations of the words of a question into an LSTM model, to achieve semantic embedding of a question. This is then combined with a user embedding matrix with a relative ranking loss function, to achieve cQA
+network embedding with question representation and relative quality rank.  
+Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question ans answer is calculated, as well as a loss function is trained with all three feature representation types.
   
 # Summary
+
+  In this report, we create a brief introduction into Graph embedding as a concept, explaining basic graph structure and variants thereof. We explain the need for embedding alongside applications and downstream tasks. A short summary of embedding models and techniques is given, explaining each categories` basic principles. After that, we introduce *node2vec* as an example of NLP derived GE models. *node2vec* being a node embedding DL model, that uses skipgram architecture, derived from *Word2vec* to represent nodes of a graph in a feature space. We go into detail, how a Random Walk creates sentence equivalents while sampling nodes from a graph and derive the final objective function for this model by introducing negative sampling as we go into why this is a major efficiency boost. We mention some *node2vec* extensions and applications proposed. Finally, a return visit to NLP tasks is made, as the problem of embedding cQA networks is introduced and discussed.
 
 \section{References}
