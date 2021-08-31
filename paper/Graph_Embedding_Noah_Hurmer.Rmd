@@ -3,7 +3,7 @@ title: |
   ![](assets/lmu.jpg)
   From Word- to Graph Embedding
 subtitle: |
-  | A Brief Introduction into GE Models utilizing Random Walk
+  | A Brief Introduction into Graph Embedding Models utilizing Random Walk
   |
   |
   |
@@ -19,6 +19,7 @@ output:
     number_sections: yes
 fontsize: 11pt
 geometry: margin=2.5cm
+classoption: a4paper
 header-includes:
 - \usepackage[linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
 - \usepackage{graphics}
@@ -78,7 +79,7 @@ data.table(
 
 # Introduction
 
-Graphs exist naturally quite often as a data structure in various fields, describing structures of networks. This can represent social networks or biological composition of proteins and their interaction as well as linguistic concepts such as language and word use therein. As understanding these structures and interactions is necessary to perform various tasks on or with these networks, graph analytics is essential. However, traditional graph analytics suffer from computational limitations. This leads to an ever increasing popularity of graph embedding (GE) models, projecting and compressing the information of a network in a feature space of defined dimensions, allowing simple applications of downstream tasks such as classification and prediction.  
+Graphs exist naturally quite often as a data structure in various fields, describing structures of networks. This can represent social networks or the biological composition of proteins and their interaction as well as linguistic concepts such as language and word use therein. As understanding these structures and interactions is necessary to perform various tasks on or with these networks, graph analytics is essential. However, traditional graph analytics suffer from computational limitations. This leads to an ever increasing popularity of graph embedding (GE) models, projecting and compressing the information of a network into a feature space of defined dimensions, allowing simple applications of downstream tasks such as classification and prediction.  
 
   As mentioned, language, or more specifically a text corpus can also be represented as a network, for instance one of word co-occurrences. Natural Language Processing (NLP) aims to equip AI with the ability to understand and apply human language, intern necessitating the need to efficiently deal with such an abstract network concept of language. Representing words as vectors in a feature space, so called word embedding, is often a step in achieving this goal. Based on this idea, general graph embedding methods have been proposed, adapting preconstructed word embedding models to accept general network data with the aid of the Random Walk (RW) concept. *DeepWalk* (@DeepWalk) and *node2vec* (@node2vec) are examples of such NLP derived RW assisted GE models.
   
@@ -100,13 +101,13 @@ Graphs exist naturally quite often as a data structure in various fields, descri
   
   These pairwise relations of a graph can also be directed in what is known as a directed or directional Graph, where the given relation only applies from one node to the other, yet not (necessarily) the other way around. The relation is therefore not symmetric and also generally does not need to be reflexive either. For instance in a social media network, the edges may be a 'following' status or something equivalent. This relation between two people is directional.  
   
-  In addition, an edge between two nodes can be weighted, where it receives a numerical label. This can represent concepts such as a cost of traversal, distance or capacity. Generally, it gives the relation of the graph a (metric) scale. This type of graph is then called a weighted Graph.
-  A simple example of this might be a road network. Here nodes can represent intersections or cities, dependent on the scale and edges connecting roads or highways. The roads can then be attributed with a time cost to use them.
+  In addition, an edge between two nodes can be weighted, where it receives a numerical label. This can represent concepts such as a cost of traversal, distance or capacity. Generally, it gives the relation of the graph a (metric) scale. This type of graph is then called a weighted Graph. (@survey)  
+  A simple example of this might be a road network. Here nodes can represent intersections or cities, dependent on the scale, and edges connecting roads or highways. The roads can then be attributed with a time cost to use them.
   
   Graphs may also be of heterogeneous mode, meaning different types or classes of nodes as well as edges can exist in a single graph. This is useful to embody networks of different interactions or effects from objects to one another. A very basic example of a heterogeneous graph is a simple semantic graph, which represents semantic relationships such as "is a" or "has" and so forth. (@survey)
   \textcolor{red}{maybe example graph plot}  
   
-  To return to the example of social networks however, these are also often heterogeneous. An example we will return to later is a so-called cQA or community Question and Answer forum. These typically have Objects of the classes "Question", "Answer" and "Profile", as well as edges such as "asked", "answered", "follows", "upvoted" and possibly more.
+  To return to the example of social networks however, these are also often heterogeneous. An example we will return to later is a so-called cQA or community Question and Answer forum. These typically have objects of the classes "Question", "Answer" and "Profile", as well as edges such as "asked", "answered", "follows", "upvoted" and possibly more.
 
 # Embedding
 
@@ -116,10 +117,10 @@ Graphs exist naturally quite often as a data structure in various fields, descri
 
   Two of the main issues with data in the form of a graph are its inherent structure and the limited applicable mathematics available to deal with that. Additionally, the computational challenge associated with any type of storage or calculation performed on it poses a problem. (@survey)
   
-  The above described composition of a graph is usually stored in a so called adjacency matrix, with the dimensions of $N\times N$, where $N$ is the number of nodes in the graph. The edges are then captured with a binary indicator (or a value for a weighted edge), whether or not two nodes are connected via an edge.
+  The above described composition of a graph is usually stored in a so called adjacency matrix, with the dimensions of $V\times V$, where $V$ is the number of nodes in the graph. The edges are then captured with a binary indicator (or a value for a weighted edge), whether or not two nodes are connected via an edge.
   The sheer size of such matrices can quickly become a problem both in form of (dynamic) storage space but also computational expense. 
   
-  Therefore we aim to compress the information of a graph down to lower dimensions and into a form that lets us better apply analysis tools. Usually a two dimensional vector space is selected as the embedding dimension. This projects the graph into an euclidean space and enables the application of a distance metric between objects in that space, enabling downstream tasks that rely on this.  
+  Therefore, we aim to compress the information of a graph down to lower dimensions and into a form that lets us better apply analysis tools. (@survey) Usually a low dimensional vector space is selected as the embedding dimension. This projects the graph into an euclidean space and enables the application of a distance metric between objects in that space, enabling downstream tasks that rely on this.  
   
   Moreover, as long as the graph does not change, once a graph has been embedded, multiple tasks and calculations can be performed without the need to embed anew, resulting in a performance gain.  
 
@@ -180,7 +181,7 @@ Scalability as well as required computational performance may additionally be in
 
 # node2vec
   
-  *node2vec* (@node2vec) is an example of such a Random Walk based DL approach to Graph Embedding. It usually represents nodes of a Graph in the feature space and is therefore a Node embedding model. 
+  *node2vec* (@node2vec) is an example of such a Random Walk based DL approach to Graph Embedding. It usually represents nodes of a Graph in the feature space and is therefore a node embedding model. 
   
 ## Word2vec summary
 
@@ -241,14 +242,14 @@ $$
   Setting $p$ low and $q$ high therefore keeps the walk very local, whilst a high $p$ almost acts like a small self-avoiding-walk (@saw) and a low $q$ ensures that the walk travels further outward from the starting node.
   As mentioned above, choosing these parameters leads to a tuned trade-off between BFS and DFS. This behaviour can be exploited in order to represent either node proximity or structural node proximity, depending on what is desired for a downstream task. (@node2vec)  
   
-  @node2vec propose to tune the hyperparameters $p$ and $q$ via Grid search over the values $\{0.25, 0.5, 0.75, 1, 2, 4\}$. They show, how specifically selecting these can lead to either different behaviours with the example of the Les Misérables coappearance network (@lesmis). Selecting a $q$ of $\frac{1}{2}p$ results in similar communities of characters that frequently engage, a sort of homophily structure, whereas selecting $q$ as $2p$ resembles structural similarities, embedding characters with similar functions (such as community bridging characters) close together. Other parameters of *node2vec*`s RW include the number as well as the length of conducted walks.
+  @node2vec propose to tune the hyperparameters $p$ and $q$ via Grid search over the values $\{0.25, 0.5, 0.75, 1, 2, 4\}$. They show, how specifically selecting these can lead to different behaviours with the example of the Les Misérables coappearance network (@lesmis). Selecting a $q$ of $\frac{1}{2}p$ results in similar communities of characters that frequently engage, a sort of homophily structure, whereas selecting $q$ as $2p$ resembles structural similarities, embedding characters with similar functions (such as community bridging characters) close together. Other parameters of *node2vec*`s RW include the number as well as the length of conducted walks.
   
 <br/>
   
   Example Graph \ref{fig:exGraph} shows an example of the RW bias $\alpha$. Consider $t$ to be the node last visited and $v$ the current node. The possible next nodes in this RW are therefore $t, x1, x2$ and $x3$ with their respective bias $\alpha$ displayed on the edge.
   
   
-```{r exGraph, fig.scap = "node2vec RW probability bias", fig.cap = "\\label{fig:exGraph}Example Graph to show the pobabilty bias of the node2vec RW. The labels on the edges represent the RW bias alpha, dependent on hyperparameters p and q. In this example, v represents the current node, while t the last visited node.", fig.align = "center"}
+```{r exGraph, fig.scap = "node2vec RW probability bias", fig.cap = "\\label{fig:exGraph}Example Graph to show the probabilty bias of the node2vec RW. The labels on the edges represent the RW bias alpha, dependent on hyperparameters p and q. In this example, v represents the current node, while t is the last visited node.", fig.align = "center"}
 
 include_graphics("plots/exGraph.pdf")
 
@@ -264,7 +265,7 @@ include_graphics("plots/exGraph.pdf")
 <br/>
 
   Projecting this method onto the task of node embedding, a RW is to be interpreted as a sentence and a node as a word. *skipgram* can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. 
-  So, let $N(u)$ be the neighbourhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
+  So, let $N_S(u)$ be the neighbourhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
   The adapted *skipgram* objective function then results in
 
 \begin{equation}
@@ -300,8 +301,7 @@ $$
   While *DeepWalk* uses this method of softmax simplification, *node2vec* implements the second suggested method, called negative sampling (NEG), which is a simplification of Noise Contrastive Estimation (NCE). (@nce, @nceAppl)  
   
 NCE proposes, that, using logistic regression, data should be separable from noise. (@Word2vec2)
-NEG adapts this idea by constructing input data for a logistic regression, combining a context object (expected output of regression = 1) with $k$ sampled negative objects (expected output of regression = 0). In the case of word embedding, objects here refer to words and the context word would be words of the context window for a target word, while negative words any other words in the text corpus.
-This easily translates into node embedding with RW, as the context nodes are simply the next nodes (dependent on context window size) of the current path.  
+NEG adapts this idea by constructing input data for a logistic regression, combining a context object (expected output of regression = 1) with $k$ sampled negative objects (expected output of regression = 0). In the case of node embedding, objects here refer to nodes and the context nodes are simply the next nodes (dependent on context window size) of the current path, while negative nodes would be any nodes of the graph not in this context window.
 
 <br/>
 
@@ -379,12 +379,12 @@ Parameters $\theta$ for embedding function $f$ are then optimized using gradient
   
   In the following, two proposed models will be used to explain this hybrid idea of graph embedding, namely Heterogeneous Social Network Learning (HSNL) and Ranking Metric Network Learning (RMNL). (@hsnl and @expert)  
   
-  Both of which utilize a RW strategy over such cQA networks. The heterogeneous structure simply has the effect of a path consisting of questions, answers and users as nodes. Equivalently, both models then input this sampled paths into an Long Short Term Memory (LSTM) Model.
+  Both of which utilize a RW strategy over such cQA networks. The heterogeneous structure simply has the effect of a path consisting of questions, answers and users as nodes. Equivalently, both models then input these sampled paths into an Long Short Term Memory (LSTM) Model.
   
-  An LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (@lstmconcept), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (@vanigrad), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
+  A LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (@lstmconcept), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (@vanigrad), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
   Such models are already widely used in NLP related embedding tasks, where words are input in a sequence (that of the sentence or context windows) to retrieve word embeddings for example. For cQA related tasks, @expert pre-train word embeddings to then enter a the sequence of embedding representations of the words of a question into an LSTM model, to achieve semantic embedding of a question. This is then combined with a user embedding matrix with a relative ranking loss function, to achieve cQA
 network embedding with question representation and relative quality rank.  
-Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question ans answer is calculated, as well as a loss function is trained with all three feature representation types.
+Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question and answer is calculated, as well as a loss function is trained with all three feature representation types.
   
 # Summary
 
