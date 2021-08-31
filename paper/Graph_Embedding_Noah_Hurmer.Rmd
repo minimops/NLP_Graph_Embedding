@@ -12,6 +12,7 @@ author: "Noah Hurmer"
 date: "31.08.2021"
 output:
   pdf_document:
+    extra_dependencies: ["flafter"]
     fig_caption: yes
     fig_height: 3
     fig_width: 7
@@ -28,6 +29,7 @@ header-includes:
 - \setlength{\parskip}{0em}
 - \usepackage[font={small,it}, labelfont={bf}]{caption}
 - \usepackage{amsmath}
+- \pagenumbering{gobble}
 bibliography: references.bib
 
 nocite: '@*'
@@ -83,11 +85,19 @@ Graphs exist naturally quite often as a data structure in various fields, descri
 
   As mentioned, language, or more specifically a text corpus can also be represented as a network, for instance one of word co-occurrences. Natural Language Processing (NLP) aims to equip AI with the ability to understand and apply human language, intern necessitating the need to efficiently deal with such an abstract network concept of language. Representing words as vectors in a feature space, so called word embedding, is often a step in achieving this goal. Based on this idea, general graph embedding methods have been proposed, adapting preconstructed word embedding models to accept general network data with the aid of the Random Walk (RW) concept. *DeepWalk* (@DeepWalk) and *node2vec* (@node2vec) are examples of such NLP derived RW assisted GE models.
   
-## Orginization
+## Organization
 
   In this report, section \ref{introduction} introduces the concept of a graph, its structure, uses and limitations, as well as explain different graph types and their impact on downstream tasks. Following that, in section \ref{embedding} we explore graph embedding in detail, exploring different types and their often bound applications. Furthermore we briefly mention different techniques to embed. Section \ref{node2vec} then dives into NLP derived Graph embedding models using Random Walks with the example of *node2vec*.
   Finally, a tie-in of RW based graph embedding back into an NLP task will be discussed in section \ref{outlook-into-rw-based-cqa-embedding-models} as an outlook, where we look at tasks associated with community based question-answer forums.
+  
+```{r maths, echo=FALSE, fig.pos= "H"}
+library(knitr)
 
+data.table(Notation = c("$\\sigma$", "$f(u)$", "$G = < V, E >$", "$n_i \\in N_S(u)$", "$d$", "$\\pi_{v, x}$", "$\\alpha_{p, q}$", "$d_{t, x}$", "$P(n_i|f(u))$", "$P_n(u)$"),
+                       Description = c("Sigmoid function", "Embedding function", "Graph with the set of Nodes $V$ and Edges $E$", "Node $n_i$ part of Neighbourhood of Node $u$", "Dimensionality of the Embedding", "Transition probability from Node $v$ to Node $x$", "RW bias of egde traversal", "Distance from Node $x$ to Node $t$", "Probability to observe Node of $N_S(u)$ given Embedding of node $u$", "Noise Distribution")) %>%
+  kable(booktabs = TRUE, format =  "latex", escape = FALSE, linesep = "", caption = "Notations used unless otherwise specified") %>%
+  kable_styling(latex_options = c("repeat_header", "striped"), full_width = FALSE)
+```
 
 ## Data structure
 
@@ -101,12 +111,16 @@ Graphs exist naturally quite often as a data structure in various fields, descri
   
   These pairwise relations of a graph can also be directed in what is known as a directed or directional Graph, where the given relation only applies from one node to the other, yet not (necessarily) the other way around. The relation is therefore not symmetric and also generally does not need to be reflexive either. For instance in a social media network, the edges may be a 'following' status or something equivalent. This relation between two people is directional.  
   
+```{r autoBahn, fig.scap = "German autobahn network", fig.cap = "\\label{fig:autoBahn}Example Graph representing the german autobahn network. Nodes here represent intersections or cities. The 13 largest city nodes are labeled and the 'A9' is represented in red. There are no weights displayed here, but one could imagine the edges having weights dependent on the speed limit or distance.", fig.align = "center"}
+
+include_graphics("plots/autoBahn.pdf")
+
+```
+  
   In addition, an edge between two nodes can be weighted, where it receives a numerical label. This can represent concepts such as a cost of traversal, distance or capacity. Generally, it gives the relation of the graph a (metric) scale. This type of graph is then called a weighted Graph. (@survey)  
-  A simple example of this might be a road network. Here nodes can represent intersections or cities, dependent on the scale, and edges connecting roads or highways. The roads can then be attributed with a time cost to use them.
+  A simple example of this might be a road network. Here nodes can represent intersections or cities, dependent on the scale, and edges connecting roads or highways. The roads can then be attributed with a time cost to use them. Figure \ref{fig:autoBahn} shows an exampe of a graph representing a road network.
   
-  Graphs may also be of heterogeneous mode, meaning different types or classes of nodes as well as edges can exist in a single graph. This is useful to embody networks of different interactions or effects from objects to one another. A very basic example of a heterogeneous graph is a simple semantic graph, which represents semantic relationships such as "is a" or "has" and so forth. (@survey)
-  \textcolor{red}{maybe example graph plot}  
-  
+  Graphs may also be of heterogeneous mode, meaning different types or classes of nodes as well as edges can exist in a single graph. This is useful to embody networks of different interactions or effects from objects to one another. A very basic example of a heterogeneous graph is a simple semantic graph, which represents semantic relationships such as "is a" or "has" and so forth. (@survey)  
   To return to the example of social networks however, these are also often heterogeneous. An example we will return to later is a so-called cQA or community Question and Answer forum. These typically have objects of the classes "Question", "Answer" and "Profile", as well as edges such as "asked", "answered", "follows", "upvoted" and possibly more.
 
 # Embedding
@@ -259,12 +273,15 @@ include_graphics("plots/exGraph.pdf")
 
   *node2vec* like some other RW-based DL embedding methods, utilizes a variation of *skipgram* as the DL model (@survey).
   As mentioned, *skipgram* originates in NLP and is used in *Word2vec* to obtain word embeddings. The model attempts to predict surrounding words of a certain range in a sentence, given a current word. 
-  In this model the hidden layer is comprised of vector representations for each of the words, so called word embeddings. 
+  In this model vector representations for each of the words are created, so called word embeddings. 
   These are created, because, in order to predict the context of a word, it attempts to represent words in the so called context window of a target word similarly to this specific word, resulting in a similar feature representations of those words. It does so, by maximizing the log probability to observe feature representations of words in the context window, given the feature representation of a word in what is hereinafter referred to as the *skipgram* objective function.  
-  
-<br/>
+```{r skipGramEx, fig.scap = "Visualization of node2vec algorithm", fig.cap = "\\label{fig:skipGramEx}Borrowed from Cohen (2018). This is crude visual representation of how node2vec embeds nodes of a graph into a feature space using RW.", fig.align = "center"}
 
-  Projecting this method onto the task of node embedding, a RW is to be interpreted as a sentence and a node as a word. *skipgram* can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. 
+include_graphics("plots/n2vecskipgram.png")
+
+```
+
+  Projecting this method onto the task of node embedding, a RW is to be interpreted as a sentence and a node as a word. *skipgram* can then be applied on the sampled paths in order to maximize the probability to oberserve a neighbourhood of a node $v$, based on the feature representation of that node. Figure \ref{fig:skipGramEx} portrays a simplification of the *node2vec* algorithm.  
   So, let $N_S(u)$ be the neighbourhood of the node $u$ and $f$ the projecting function to our feature space: $f : V \to \mathbb{R}^d$ , where $d$ denotes the number of dimensions of the desired feature space.
   The adapted *skipgram* objective function then results in
 
@@ -289,7 +306,8 @@ $$
 $$
 \max_{f} \sum_{u \in V} -log \left( \sum_{v \in V} exp(f(v) * f(u)) \right) + \sum_{n_i\in N_S(u)} f(n_i) * f(u)
 $$
-  
+
+
 ### Negative Sampling
 
   However, the first sum of the objective function of the skipgram model, also called the per-node partition function by @node2vec, $\sum_{v \in V} exp(f(v) * f(u))$, is very expense to compute directly, as it necessitates calculating a $|V|$-way softmax equation every iteration. In addition, even though all weights are recalculated every step, most weights will not be altered by a relevant amount.  
@@ -302,10 +320,6 @@ $$
   
 NCE proposes, that, using logistic regression, data should be separable from noise. (@Word2vec2)
 NEG adapts this idea by constructing input data for a logistic regression, combining a context object (expected output of regression = 1) with $k$ sampled negative objects (expected output of regression = 0). In the case of node embedding, objects here refer to nodes and the context nodes are simply the next nodes (dependent on context window size) of the current path, while negative nodes would be any nodes of the graph not in this context window.
-
-<br/>
-
-\textcolor{red}{example}  
 
 <br/>
 
@@ -382,9 +396,15 @@ Parameters $\theta$ for embedding function $f$ are then optimized using gradient
   Both of which utilize a RW strategy over such cQA networks. The heterogeneous structure simply has the effect of a path consisting of questions, answers and users as nodes. Equivalently, both models then input these sampled paths into an Long Short Term Memory (LSTM) Model.
   
   A LSTM is an extension of a traditional Recurrent Neural Network (RNN). RNNs handle context by storing information of past inputs for an amount of time (in steps) (@lstmconcept), making them ideal for the data structure of a linear data stream, such as sentences or in this case paths of a RW. A RNN has the problem of decreasing weight every step, called the vanishing gradient problem (@vanigrad), causing long term dependencies to be left undiscovered. LSTMs however forgo this problem, forcing constant error flow with Constant Error Carousel (CEC) cells. The hidden layer of a (vanilla) LSTM model consists of recurrently connected memory blocks with three gates each - an input, output and forget gate.
-  Such models are already widely used in NLP related embedding tasks, where words are input in a sequence (that of the sentence or context windows) to retrieve word embeddings for example. For cQA related tasks, @expert pre-train word embeddings to then enter a the sequence of embedding representations of the words of a question into an LSTM model, to achieve semantic embedding of a question. This is then combined with a user embedding matrix with a relative ranking loss function, to achieve cQA
-network embedding with question representation and relative quality rank.  
-Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question and answer is calculated, as well as a loss function is trained with all three feature representation types.
+  Such models are already widely used in NLP related embedding tasks, where words are input in a sequence (that of the sentence or context windows) to retrieve word embeddings for example. For cQA related tasks, @expert pre-train word embeddings to then enter a the sequence of embedding representations of the words of a question into an LSTM model, to achieve semantic embedding of a question. This is then combined with a user embedding matrix with a relative ranking loss function, to achieve cQA network embedding with question representation and relative quality rank. 
+
+```{r lstmcQA, fig.scap = "HSNL model to embedd cQA", fig.cap = "\\label{fig:lstmcQA}Figure borrowed from Fang et al. (2016). Overview of the proposed HSNL network to learn cQA embeddings. (a) shows an example graph, which a Random Walk traverses, creating paths as in (b). (c) represents the seperate embeddings and (d) the recombination.", fig.align = "center"}
+
+include_graphics("plots/LSTM_cQA_model.png")
+
+```
+
+Similarly, @hsnl embed questions, answers and users into feature vectors separately, a matching score between question and answer is calculated, as well as a loss function is trained with all three feature representation types, see figure \ref{fig:lstmcQA}
   
 # Summary
 
